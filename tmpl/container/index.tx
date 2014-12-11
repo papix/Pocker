@@ -1,0 +1,78 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>
+        Containers
+        <small>
+            <a href="<: uri_for('/container/create') :>" class="btn btn-primary">Create</a>
+            <a href="<: uri_for('/container/reload') :>" class="btn btn-primary">Reload</a>
+        </small>
+    </h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>Hostname</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th colspan="4">Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+    : for $containers -> $container {
+            <tr>
+                <td><: $container.ip :></td>
+                <td>
+                    <: $container.hostname :>
+                    <a href="<: uri_for('/container/'~$container.ip~'/detail'):>" class="btn btn-primary btn-xs">Detail</a>
+                </td>
+                <td><: $container.image :></td>
+                <td>
+        : if $container.status == 1 {
+                <span class="label label-primary">Running</span>
+        : } else {
+                <span class="label label-warning">Stopped</span>
+        : }
+                </td>
+        : if $container.status == 1 {
+                <td><button class="btn btn-primary" disabled="disabled">Start</button></td>
+                <td>
+                    <form action="<: uri_for('/container/'~$container.ip~'/restart') :>" method="POST">
+                        <button type="submit" class="btn btn-primary">Restart</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="<: uri_for('/container/'~$container.ip~'/stop') :>" method="POST">
+                        <button type="submit" class="btn btn-warning">Stop</button>
+                    </form>
+                </td>
+                <td><button class="btn btn-danger" disabled="disabled">Delete</button></td>
+        : } else {
+                <td>
+                    <form action="<: uri_for('/container/'~$container.ip~'/start') :>" method="POST">
+                        <button type="submit" class="btn btn-primary">Start</button>
+                    </form>
+                </td>
+                <td><button class="btn btn-primary" disabled="disabled">Restart</button></td>
+                <td><button class="btn btn-warning" disabled="disabled">Stop</button></td>
+                <td>
+                    <button class="btn btn-danger" data-toggle="modal" data-target="#container-modal-<: $container.id :>">Delete</button>
+            : include 'include/modal.tx' {
+            :   id           => 'container-modal-' ~ $container.id,
+            :   uri          => '/container/' ~ $container.ip ~ '/delete',
+            :   title        => 'Delete Container (' ~ $container.hostname ~ ')',
+            :   body         => $container.ip ~ '(' ~ $container.hostname ~ ')を削除してもよろしいですか?',
+            :   button_class => 'danger',
+            :   button       => 'Delete',
+            : };
+                </td>
+        : }
+            </tr>
+        </tbody>
+    : }
+    </table>
+</div>
+
+: }

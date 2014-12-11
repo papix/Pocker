@@ -1,0 +1,11 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>Pocker!</h1>
+
+    (╹◡╹) Pocker〜
+</div>
+
+: }

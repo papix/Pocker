@@ -1,0 +1,42 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>
+        Container Details
+        <small><: $container.hostname :></small>
+    </h1>
+    <table class="table">
+        <tr>
+            <td>Container ID</td>
+            <td><: $container.id :></td>
+        </tr>
+        <tr>
+            <td>Image</td>
+            <td><: $container.image :></td>
+        </tr>
+        <tr>
+            <td>IP</td>
+            <td><: $container.ip :></td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td><: $container.status ? 'Running' : 'Stopped' :></td>
+        </tr>
+        <tr>
+            <td>Command</td>
+            <td><: $info.Config.Cmd.join(' ') :></td>
+        </tr>
+        <tr>
+            <td>Env</td>
+            <td>
+        : for $info.Config.Env -> $env {
+                <: $env :><: if not $~env.is_last { :><br><: } :>
+        : }
+            </td>
+        </tr>
+    </table>
+</div>
+
+: }

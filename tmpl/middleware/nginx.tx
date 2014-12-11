@@ -1,0 +1,32 @@
+server {
+    listen      80;
+
+    access_log /var/log/pocker/nginx/access.log ltsv;
+    error_log  /var/log/pocker/nginx/error.log  info;
+}
+
+: for $proxies -> $proxy {
+:   if $proxy.mapping().size() > 0 {
+upstream <: $proxy.virtual_host :> {
+    : for $proxy.mapping() -> $mapping {
+    server <: $mapping.container().ip :>:<: $mapping.proxy_port :> weight=1;
+    : }
+}
+server {
+    listen      <: $proxy.listen_port :>;
+    server_name <: $proxy.virtual_host :>;
+    location / {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade            $http_upgrade;
+        proxy_set_header Connection         "upgrade";
+        proxy_set_header Host               $host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        proxy_set_header X-Forwarded-Host   $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_pass http://<: $proxy.virtual_host :>;
+    }
+}
+:   }
+: }

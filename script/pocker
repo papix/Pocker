@@ -1,0 +1,13 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use Proclet::Declare;
+
+color;
+
+service('app', 'plackup -Ilib -r -R ./lib --access-log /dev/null -p 80 -a ./script/pocker-server');
+service('worker', 'perl -Ilib ./script/pocker-worker');
+
+run;

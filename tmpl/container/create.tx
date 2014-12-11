@@ -1,0 +1,82 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>Create Containers</h1>
+
+    : if $validator.has_error {
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">
+                <ul>
+        : for $validator.get_error_messages() -> $message {
+                    <li><: $message :></li>
+        : }
+                </ul>
+            </div>
+        </div>
+    : }
+
+    <form action="<: uri_for('/container/create') :>" method="POST" class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">IP Address</label>
+            <div class="col-sm-10">
+                <select name="ip" class="form-control">
+    : for unused_ipaddresses() -> $ip {
+                    <option value="192.168.10.<: $ip :>">192.168.10.<: $ip :></option>
+    : }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Container Image</label>
+            <div class="col-sm-10">
+                <select name="image" class="form-control">
+    : for $images -> $image {
+                    <option value="<: $image.repository :>:<: $image.tag :>"><: $image.repository :>:<: $image.tag :></option>
+    : }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Hostname</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="hostname" placeholder="Hostname">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Env</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="5" name="env"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Command</label>
+            <div class="col-sm-10">
+                <label class="radio-inline">
+                    <input type="radio" name="command" value="default" checked> Default Setting
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="command" value="init"> /sbin/init
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <input type="radio" name="command" value="text">
+                </span>
+                <input type="text" class="form-control" name="command_text" placeholder="Command">
+            </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary pull-right">Create</button>
+            <div class="col-sm-12">
+        </div>
+    </form>
+</div>
+
+: }

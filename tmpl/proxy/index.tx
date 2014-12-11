@@ -1,0 +1,86 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>
+        HTTP Proxy
+        <small>
+            <a href="<: uri_for('/proxy/create') :>" class="btn btn-primary">Create</a>
+        </small>
+    </h1>
+
+    : if $validator.has_error {
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">
+                <ul>
+        : for $validator.get_error_messages() -> $message {
+                    <li><: $message :></li>
+        : }
+                </ul>
+            </div>
+        </div>
+    : }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Virtual Host</th>
+                <th>Listen Port</th>
+                <th>Instance</th>
+                <th>Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+    : for $proxies -> $proxy {
+            <tr>
+                <td><: $proxy.virtual_host :></td>
+                <td><: $proxy.listen_port :></td>
+                <td>
+        : for $proxy.mapping -> $mapping {
+                    <p>
+                        <: $mapping.container.ip :>:<: $mapping.proxy_port :> (<: $mapping.container.hostname :>)
+                        <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#proxy-map-modal-<: $mapping.id :>">
+                            Delete
+                        </button>
+                    </p>
+            : include 'include/modal.tx' {
+            :   id           => 'proxy-map-modal-' ~ $mapping.id,
+            :   uri          => '/proxy/mapping/' ~ $mapping.id ~ '/delete',
+            :   title        => 'Delete Container from Proxy (' ~ $proxy.virtual_host ~ ':' ~ $proxy.listen_port ~ ')',
+            :   body         => $mapping.container.ip ~ ':' ~ $mapping.proxy_port ~' (' ~ $mapping.container.hostname ~ ')への紐付けを削除してもよろしいですか?',
+            :   button_class => 'danger',
+            :   button       => 'delete',
+            : };
+        : }
+                </td>
+                <td>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#proxy-modal-<: $proxy.id :>">
+                        Add Container
+                    </button>
+        : include 'include/modal/proxy_mapping_create.tx' {
+        :   id           => 'proxy-modal-' ~ $proxy.id,
+        :   uri          => '/proxy/mapping/' ~ $proxy.id ~ '/create',
+        :   title        => 'Add Container for Proxy (' ~ $proxy.virtual_host ~ ':' ~ $proxy.listen_port ~ ')',
+        :   containers   => $containers,
+        : };
+
+                    <button class="btn btn-danger" data-toggle="modal" data-target="#proxy-delete-modal-<: $proxy.id :>">
+                        Delete Proxy
+                    </button>
+        : include 'include/modal.tx' {
+        :   id           => 'proxy-delete-modal-' ~ $proxy.id,
+        :   uri          => '/proxy/' ~ $proxy.id ~ '/delete',
+        :   title        => 'Delete Proxy (' ~ $proxy.virtual_host ~ ':' ~ $proxy.listen_port ~ ')',
+        :   body         => '削除してもよろしいですか?',
+        :   button_class => 'danger',
+        :   button       => 'delete',
+        : };
+                </td>
+            </tr>
+        </tbody>
+    : }
+    </table>
+</div>
+
+: }

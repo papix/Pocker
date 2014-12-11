@@ -1,0 +1,32 @@
+use strict;
+use warnings;
+use lib 'lib';
+
+# DDL
+desc 'GitDDL::Migratorの導入準備を行う';
+task ddl_deploy => sub {
+    require Pocker::CLI::DDL;
+    Pocker::CLI::DDL->deploy;
+};
+desc '最新のDDLとデータベースの差分を確認する';
+task ddl_diff => sub {
+    require Pocker::CLI::DDL;
+    Pocker::CLI::DDL->diff;
+};
+desc '最新のDDLとデータベースの不一致を確認する';
+task ddl_check_version => sub {
+    require Pocker::CLI::DDL;
+    Pocker::CLI::DDL->check_version;
+};
+desc 'データベースを最新のDDLに対応させる';
+task ddl_upgrade => sub {
+    require Pocker::CLI::DDL;
+    Pocker::CLI::DDL->upgrade;
+};
+
+# DumpSchema
+desc 'Teng用のSchemaファイルをダンプする';
+task dump_schema => sub {
+    require Pocker::CLI::DumpSchema;
+    Pocker::CLI::DumpSchema->run;
+};

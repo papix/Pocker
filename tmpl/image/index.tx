@@ -1,0 +1,56 @@
+: cascade "include/layout.tx"
+
+: override content -> {
+
+<div class="row">
+    <h1>
+        Images
+        <small>
+            <a href="<: uri_for('/image/reload') :>" class="btn btn-primary">Reload</a>
+        </small>
+    </h1>
+
+    <form class="form-inline pull-right" method="POST" action="<: uri_for('/image/pull') :>">
+        <div class="form-group">
+            <label class="sr-only">Repository</label>
+            <input type="text" class="form-control" placeholder="Repository" name="repository">
+        </div>
+        <button type="submit" class="btn btn-primary">Pull Repository</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Container</th>
+            </tr>
+        </thead>
+        <tbody>
+    : for $images -> $image {
+        : my $containers = $image.container();
+            <tr>
+                <td><: $image.repository :>:<: $image.tag :></td>
+                <td><: $image.id :></td>
+                <td><: $containers.size() :></td>
+                <td>
+        : if $containers.size() == 0 {
+                    <button class="btn btn-danger" data-toggle="modal" data-target="#image-modal-<: $image.id :>">Delete</button>
+            : include 'include/modal.tx' {
+            :   id           => 'image-modal-' ~ $image.id,
+            :   uri          => '/image/' ~ $image.id ~ '/delete',
+            :   title        => 'Delete Image (' ~ $image.repository ~ ':' ~ $image.tag ~ ')',
+            :   body         => $image.repository ~ ':' ~ $image.tag ~ 'を削除してもよろしいですか?',
+            :   button_class => 'danger',
+            :   button       => 'delete',
+            : };
+        : } else {
+                    <button class="btn btn-danger" disabled="disabled">Delete</button>
+        : }
+                </td>
+            </tr>
+    : }
+        </tbody>
+    </table>
+</div>
+: }

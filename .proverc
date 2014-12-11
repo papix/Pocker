@@ -1,0 +1,2 @@
+-l
+-PMySQLPool=Pocker::Test::DB

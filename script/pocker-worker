@@ -1,0 +1,27 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use Path::Tiny;
+use Qudo;
+
+use Pocker::Worker::Image;
+
+my $config_path = path( 'config', lc( $ENV{PLACK_ENV} || 'development' ).'.pl' );
+my $config = do $config_path or die "$config_path: $!";
+my $conf = $config->{worker_dbi} or die "Missing configuration about DBI";
+
+my $worker = Qudo->new(
+    driver_class => 'Skinny',
+    databases    => [{
+        dsn      => $conf->[0],
+        username => $conf->[1],
+        password => $conf->[2],
+    }],
+    manager_abilities => [qw/
+        Pocker::Worker::Image
+    /],
+);
+
+$worker->work;
